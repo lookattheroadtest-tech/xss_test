@@ -2,33 +2,20 @@ name: Dalfox XSS Scan (demo.testfire.net)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ]
 
 jobs:
   dalfox:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Pull Dalfox Docker image
-        run: docker pull hahwul/dalfox
-
       - name: Run Dalfox XSS scan
-        run: |
-          docker run --rm hahwul/dalfox \
-            url "http://demo.testfire.net/search.jsp?query=test" \
-            --format json \
-            --output /dalfox/result.json
-
-      - name: Copy report from container
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/out \
             hahwul/dalfox \
-            sh -c "cp /dalfox/result.json /out/dalfox-result.json"
+            dalfox url "http://demo.testfire.net/search.jsp?query=test" \
+            --format json \
+            --output /out/dalfox-result.json
 
       - name: Upload Dalfox report
         uses: actions/upload-artifact@v4
